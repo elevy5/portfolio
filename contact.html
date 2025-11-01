@@ -263,7 +263,11 @@
             <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-8 md:p-12 scroll-reveal">
                 <h2 class="font-display text-3xl md:text-4xl font-bold mb-8 text-center">Send Me a Message</h2>
                 
-                <form id="contact-form" method="POST" class="space-y-6">
+                <form id="contact-form" action="https://api.web3forms.com/submit" method="POST" class="space-y-6">
+                    <!-- Web3Forms Access Key -->
+                    <input type="hidden" name="access_key" value="71a929f4-6880-4b11-bf7f-0c56b310e0d3">
+                    <input type="hidden" name="from_name" value="Portfolio Contact Form">
+
                     <div id="form-success" class="success-message hidden">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -281,7 +285,7 @@
                             <span class="error-text">An error occurred. Please try again.</span>
                         </div>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Full Name *</label>

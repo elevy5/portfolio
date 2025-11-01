@@ -132,8 +132,9 @@ async function handleFormSubmission(e) {
         loadingText.classList.remove('hidden');
 
         try {
-            // Send to Formspree
-            const response = await fetch('https://formspree.io/contact@elielevy.pro', {
+            // Send to Web3Forms
+            const formAction = form.getAttribute('action');
+            const response = await fetch(formAction, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -141,12 +142,13 @@ async function handleFormSubmission(e) {
                 }
             });
 
-            if (response.ok) {
+            const result = await response.json();
+
+            if (result.success) {
                 showFormSuccess();
                 form.reset();
             } else {
-                const errorData = await response.json();
-                showFormError(errorData.errors ? 'Please check your form fields and try again.' : 'Failed to send message. Please try again.');
+                showFormError(result.message || 'Failed to send message. Please try again.');
             }
         } catch (error) {
             showFormError('Network error. Please check your connection and try again.');
