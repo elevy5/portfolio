@@ -97,34 +97,65 @@ function initFormValidation() {
     }
 }
 
-function handleFormSubmission(e) {
+async function handleFormSubmission(e) {
     e.preventDefault();
-    
+
     const form = e.target;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData);
-    
+
     // Validate all fields
     let isValid = true;
     const requiredFields = ['name', 'email', 'subject', 'message'];
-    
+
     requiredFields.forEach(field => {
         if (!validateFieldValue(data[field])) {
             showFieldError(field, `${field.charAt(0).toUpperCase() + field.slice(1)} is required`);
             isValid = false;
         }
     });
-    
+
     // Email validation
     if (data.email && !isValidEmail(data.email)) {
         showFieldError('email', 'Please enter a valid email address');
         isValid = false;
     }
-    
+
     if (isValid) {
-        // Simulate form submission
-        showFormSuccess();
-        form.reset();
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const submitText = submitBtn.querySelector('.submit-text');
+        const loadingText = submitBtn.querySelector('.loading-text');
+
+        submitBtn.disabled = true;
+        submitText.classList.add('hidden');
+        loadingText.classList.remove('hidden');
+
+        try {
+            // Send to Formspree
+            const response = await fetch('https://formspree.io/contact@elielevy.pro', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                showFormSuccess();
+                form.reset();
+            } else {
+                const errorData = await response.json();
+                showFormError(errorData.errors ? 'Please check your form fields and try again.' : 'Failed to send message. Please try again.');
+            }
+        } catch (error) {
+            showFormError('Network error. Please check your connection and try again.');
+        } finally {
+            // Reset button state
+            submitBtn.disabled = false;
+            submitText.classList.remove('hidden');
+            loadingText.classList.add('hidden');
+        }
     }
 }
 
@@ -182,10 +213,35 @@ function isValidEmail(email) {
 
 function showFormSuccess() {
     const successMessage = document.getElementById('form-success');
+    const errorMessage = document.getElementById('form-error');
+
+    // Hide error if showing
+    if (errorMessage) {
+        errorMessage.classList.add('hidden');
+    }
+
     if (successMessage) {
         successMessage.classList.remove('hidden');
         setTimeout(() => {
             successMessage.classList.add('hidden');
+        }, 5000);
+    }
+}
+
+function showFormError(message) {
+    const errorMessage = document.getElementById('form-error');
+    const successMessage = document.getElementById('form-success');
+
+    // Hide success if showing
+    if (successMessage) {
+        successMessage.classList.add('hidden');
+    }
+
+    if (errorMessage) {
+        errorMessage.querySelector('.error-text').textContent = message;
+        errorMessage.classList.remove('hidden');
+        setTimeout(() => {
+            errorMessage.classList.add('hidden');
         }, 5000);
     }
 }
