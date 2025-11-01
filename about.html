@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Elie Levy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-navy: #1a202c;
+            --primary-purple: #553c9a;
+            --primary-violet: #805ad5;
+            --accent-lavender: #e9d8fd;
+            --text-white: #ffffff;
+            --text-gray: #e2e8f0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-purple) 100%);
+            color: var(--text-white);
+            overflow-x: hidden;
+        }
+        
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .glass-nav {
+            backdrop-filter: blur(10px);
+            background: rgba(26, 32, 44, 0.8);
+            border-bottom: 1px solid rgba(233, 216, 253, 0.1);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-violet);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .profile-image {
+            transition: all 0.3s ease;
+            border: 3px solid rgba(128, 90, 213, 0.3);
+        }
+        
+        .profile-image:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-violet);
+            box-shadow: 0 20px 40px rgba(128, 90, 213, 0.3);
+        }
+        
+        .skill-bar {
+            background: rgba(26, 32, 44, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            background: linear-gradient(90deg, var(--primary-purple) 0%, var(--primary-violet) 100%);
+            height: 8px;
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-violet);
+            border-radius: 50%;
+            border: 3px solid var(--primary-navy);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1.5rem;
+            width: 2px;
+            height: calc(100% - 1rem);
+            background: rgba(128, 90, 213, 0.3);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .stats-card {
+            background: rgba(26, 32, 44, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(233, 216, 253, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-violet);
+            box-shadow: 0 15px 30px rgba(128, 90, 213, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape w-16 h-16 bg-purple-500 rounded-full" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="shape w-12 h-12 bg-violet-500 rounded-lg" style="top: 60%; left: 80%; animation-delay: 2s;"></div>
+        <div class="shape w-20 h-20 bg-indigo-500 rounded-full" style="top: 80%; left: 20%; animation-delay: 4s;"></div>
+        <div class="shape w-8 h-8 bg-purple-400 rounded-lg" style="top: 40%; left: 70%; animation-delay: 1s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 w-full z-50 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="font-display text-2xl font-bold text-white hover:text-purple-300 transition-colors">
+                ELIE LEVY
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link text-white hover:text-purple-300">Home</a>
+                <a href="portfolio.html" class="nav-link text-white hover:text-purple-300">Portfolio</a>
+                <a href="about.html" class="nav-link text-purple-300">About</a>
+                <a href="contact.html" class="nav-link text-white hover:text-purple-300">Contact</a>
+            </div>
+            
+            <a href="https://linkedin.com" target="_blank" class="text-white hover:text-purple-300 transition-colors">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+            </a>
+            
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-white" id="mobile-menu-btn">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden mt-4 pb-4" id="mobile-menu">
+            <a href="index.html" class="block py-2 text-white hover:text-purple-300">Home</a>
+            <a href="portfolio.html" class="block py-2 text-white hover:text-purple-300">Portfolio</a>
+            <a href="about.html" class="block py-2 text-purple-300">About</a>
+            <a href="contact.html" class="block py-2 text-white hover:text-purple-300">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="scroll-reveal">
+                    <h1 class="font-display text-5xl md:text-6xl font-bold mb-6">About Me</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                        I'm a passionate Product Manager with over 8 years of experience in transforming complex business challenges into innovative digital solutions. My approach combines data-driven insights with user-centered design to deliver products that exceed customer expectations and drive sustainable business growth.
+                    </p>
+                    <p class="text-lg text-gray-400 leading-relaxed mb-8">
+                        Throughout my career, I've led cross-functional teams to launch successful products across SaaS, mobile, and enterprise platforms, consistently achieving measurable improvements in user engagement, conversion rates, and revenue growth.
+                    </p>
+                    <a href="contact.html" class="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold text-lg transition-colors">
+                        Get In Touch
+                    </a>
+                </div>
+                
+                <div class="scroll-reveal">
+                    <div class="relative">
+                        <img src="./resources/profile-photo.jpg" 
+                             alt="Elie Levy" 
+                             class="profile-image w-full max-w-md mx-auto rounded-2xl shadow-2xl">
+                        <div class="absolute -top-4 -right-4 w-24 h-24 bg-purple-600 rounded-full opacity-20"></div>
+                        <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-violet-600 rounded-full opacity-20"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 px-6 bg-black bg-opacity-20">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="stats-card rounded-xl p-6 text-center scroll-reveal">
+                    <div class="text-4xl font-bold text-purple-400 mb-2">8+</div>
+                    <div class="text-gray-300">Years Experience</div>
+                </div>
+                <div class="stats-card rounded-xl p-6 text-center scroll-reveal">
+                    <div class="text-4xl font-bold text-purple-400 mb-2">50+</div>
+                    <div class="text-gray-300">Products Launched</div>
+                </div>
+                <div class="stats-card rounded-xl p-6 text-center scroll-reveal">
+                    <div class="text-4xl font-bold text-purple-400 mb-2">25+</div>
+                    <div class="text-gray-300">Team Members Led</div>
+                </div>
+                <div class="stats-card rounded-xl p-6 text-center scroll-reveal">
+                    <div class="text-4xl font-bold text-purple-400 mb-2">95%</div>
+                    <div class="text-gray-300">Client Satisfaction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Professional Background -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Professional Background</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    My journey in product management has been driven by a passion for solving complex problems and creating meaningful user experiences.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="scroll-reveal">
+                    <h3 class="text-2xl font-semibold mb-6">Core Philosophy</h3>
+                    <p class="text-gray-300 mb-6 leading-relaxed">
+                        I believe that great products are born from the intersection of user needs, business objectives, and technical feasibility. My approach focuses on deeply understanding the user journey while maintaining a clear vision of the strategic business goals.
+                    </p>
+                    <p class="text-gray-300 mb-6 leading-relaxed">
+                        Every product decision should be backed by data, validated by user research, and aligned with the company's long-term vision. I'm passionate about building products that not only solve immediate problems but also create lasting value for users and businesses.
+                    </p>
+                    <p class="text-gray-300 leading-relaxed">
+                        Collaboration is at the heart of my process. I work closely with engineering, design, marketing, and sales teams to ensure that every product decision is well-informed and executed with excellence.
+                    </p>
+                </div>
+                
+                <div class="scroll-reveal">
+                    <h3 class="text-2xl font-semibold mb-6">Skills & Expertise</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Product Strategy</span>
+                                <span class="text-purple-400">95%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">User Research & UX</span>
+                                <span class="text-purple-400">90%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Data Analysis</span>
+                                <span class="text-purple-400">85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Agile & Scrum</span>
+                                <span class="text-purple-400">92%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Team Leadership</span>
+                                <span class="text-purple-400">88%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Technical Knowledge</span>
+                                <span class="text-purple-400">80%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Career Timeline -->
+    <section class="py-20 px-6 bg-black bg-opacity-20">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Career Journey</h2>
+                <p class="text-xl text-gray-300">
+                    Key milestones in my product management career
+                </p>
+            </div>
+            
+            <div class="space-y-8">
+                <div class="timeline-item scroll-reveal">
+                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Senior Product Manager</h3>
+                            <span class="text-purple-400 font-medium">2022 - Present</span>
+                        </div>
+                        <p class="text-gray-300 mb-3">TechCorp Solutions</p>
+                        <p class="text-gray-400 leading-relaxed">
+                            Leading the development of enterprise SaaS products serving Fortune 500 clients. Managed cross-functional teams of 15+ members and launched 3 major product lines with combined revenue of $50M+.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item scroll-reveal">
+                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Product Manager</h3>
+                            <span class="text-purple-400 font-medium">2020 - 2022</span>
+                        </div>
+                        <p class="text-gray-300 mb-3">InnovateLabs</p>
+                        <p class="text-gray-400 leading-relaxed">
+                            Drove product strategy for mobile and web applications. Launched customer analytics platform that increased user engagement by 40% and reduced churn by 25%.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item scroll-reveal">
+                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Associate Product Manager</h3>
+                            <span class="text-purple-400 font-medium">2018 - 2020</span>
+                        </div>
+                        <p class="text-gray-300 mb-3">StartupVenture</p>
+                        <p class="text-gray-400 leading-relaxed">
+                            Managed product lifecycle from conception to launch. Built MVP for B2B marketplace that attracted 1000+ users in first 6 months and secured Series A funding.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item scroll-reveal">
+                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Business Analyst</h3>
+                            <span class="text-purple-400 font-medium">2016 - 2018</span>
+                        </div>
+                        <p class="text-gray-300 mb-3">DataDriven Corp</p>
+                        <p class="text-gray-400 leading-relaxed">
+                            Analyzed business requirements and user needs. Conducted market research and competitive analysis that informed product roadmap decisions and feature prioritization.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education & Certifications -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Education & Certifications</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6 scroll-reveal">
+                    <h3 class="text-xl font-semibold mb-3">Master of Business Administration</h3>
+                    <p class="text-purple-400 mb-2">Stanford University</p>
+                    <p class="text-gray-400 mb-4">Concentration: Entrepreneurship & Innovation</p>
+                    <p class="text-gray-300 text-sm">Graduated Magna Cum Laude, Class of 2016</p>
+                </div>
+                
+                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6 scroll-reveal">
+                    <h3 class="text-xl font-semibold mb-3">Bachelor of Science</h3>
+                    <p class="text-purple-400 mb-2">UC Berkeley</p>
+                    <p class="text-gray-400 mb-4">Computer Science & Economics</p>
+                    <p class="text-gray-300 text-sm">Minor in Design Innovation, Class of 2014</p>
+                </div>
+                
+                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6 scroll-reveal">
+                    <h3 class="text-xl font-semibold mb-3">Certified Scrum Product Owner</h3>
+                    <p class="text-purple-400 mb-2">Scrum Alliance</p>
+                    <p class="text-gray-400 mb-4">CSPO Certification</p>
+                    <p class="text-gray-300 text-sm">Renewed 2024</p>
+                </div>
+                
+                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6 scroll-reveal">
+                    <h3 class="text-xl font-semibold mb-3">Google Analytics Certified</h3>
+                    <p class="text-purple-400 mb-2">Google</p>
+                    <p class="text-gray-400 mb-4">Advanced Analytics & Data Insights</p>
+                    <p class="text-gray-300 text-sm">Certified 2023</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-gray-400">&copy; 2024 Elie Levy. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Initialize skill bars animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const skillBars = document.querySelectorAll('.skill-progress');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const bar = entry.target;
+                        const width = bar.style.width;
+                        bar.style.width = '0%';
+                        
+                        setTimeout(() => {
+                            bar.style.width = width;
+                        }, 200);
+                    }
+                });
+            });
+            
+            skillBars.forEach(bar => observer.observe(bar));
+        });
+    </script>
+</body>
+</html>
