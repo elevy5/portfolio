@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sci-Fi Story Generator</title>
+    <meta name="description" content="Create unique science fiction stories with AI-powered text and illustrations">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --primary-navy: #1a202c;
+            --primary-purple: #553c9a;
+            --primary-violet: #805ad5;
+            --accent-lavender: #e9d8fd;
+            --text-white: #ffffff;
+            --text-gray: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-purple) 100%);
+            color: var(--text-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Animated Background Shapes */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .shape1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-violet);
+            top: -100px;
+            left: -100px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .shape2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-lavender);
+            bottom: -50px;
+            right: -50px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        .shape3 {
+            width: 200px;
+            height: 200px;
+            background: var(--primary-violet);
+            top: 50%;
+            right: 10%;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        /* Glass morphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(26, 32, 44, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--accent-lavender);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--text-white);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-violet);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        select option {
+            background: var(--primary-navy);
+            color: var(--text-white);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-violet) 0%, var(--primary-purple) 100%);
+            color: var(--text-white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(128, 90, 213, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Story Display */
+        .story-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .story-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-lavender);
+            text-align: center;
+        }
+
+        .story-text {
+            margin: 1.5rem 0;
+        }
+
+        .story-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border-radius: 12px;
+            margin: 2rem auto;
+            display: block;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Loading Animation */
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary-violet);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Audio Controls */
+        .audio-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .audio-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-violet);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.1);
+            background: var(--primary-purple);
+        }
+
+        /* API Key Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--primary-navy);
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Checkbox styling */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        /* Slider styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            border-radius: 15px;
+            height: 8px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-violet);
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-violet);
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast-success {
+            background: #48bb78;
+        }
+
+        .toast-error {
+            background: #f56565;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .story-title {
+                font-size: 1.8rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Shapes -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <h1 class="text-2xl font-bold">🌌 AI Sci-Fi Story Generator</h1>
+            <a href="https://github.com/elevy5/story-generator" target="_blank" class="text-white hover:text-purple-300">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 px-4" style="position: relative; z-index: 1;">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl md:text-6xl font-bold mb-4">
+                    Create Unique Sci-Fi Stories
+                </h2>
+                <p class="text-xl text-gray-300">
+                    AI-powered stories with illustrations and audio narration
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Configuration Panel -->
+                <div class="md:col-span-1">
+                    <div class="glass p-6 sticky top-24">
+                        <h2 class="text-2xl font-bold mb-6">Story Settings</h2>
+
+                        <form id="storyForm">
+                            <div class="form-group">
+                                <label for="ageGroup">Age Group</label>
+                                <select id="ageGroup" required>
+                                    <option value="children">Children (6-10)</option>
+                                    <option value="teens">Teens (11-15)</option>
+                                    <option value="young-adult" selected>Young Adult (16+)</option>
+                                    <option value="adult">Adult</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="theme">Theme</label>
+                                <select id="theme" required>
+                                    <option value="space-exploration">Space Exploration</option>
+                                    <option value="time-travel">Time Travel</option>
+                                    <option value="alien-contact">Alien Contact</option>
+                                    <option value="dystopian">Dystopian Future</option>
+                                    <option value="cyberpunk">Cyberpunk</option>
+                                    <option value="robot-ai">Robots & AI</option>
+                                    <option value="parallel-universe">Parallel Universe</option>
+                                    <option value="post-apocalyptic">Post-Apocalyptic</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="storyLength">Story Length</label>
+                                <select id="storyLength" required>
+                                    <option value="short">Short (500 words)</option>
+                                    <option value="medium" selected>Medium (1000 words)</option>
+                                    <option value="long">Long (1500 words)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="protagonist">Protagonist Name (Optional)</label>
+                                <input type="text" id="protagonist" placeholder="e.g., Nova, Zara, Alex">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="customPrompt">Additional Details (Optional)</label>
+                                <textarea id="customPrompt" rows="3" placeholder="Add specific elements, plot points, or themes..."></textarea>
+                            </div>
+
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="generateImage" checked>
+                                <label for="generateImage" style="margin: 0;">Generate illustration</label>
+                            </div>
+
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="enableAudio">
+                                <label for="enableAudio" style="margin: 0;">Enable audio narration</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-full">
+                                <span id="generateBtnText">🚀 Generate Story</span>
+                            </button>
+                        </form>
+
+                        <div class="mt-4 text-sm text-gray-400 text-center">
+                            <button id="apiKeyBtn" class="text-accent-lavender hover:underline">
+                                ⚙️ Configure API Key
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Story Display -->
+                <div class="md:col-span-2">
+                    <div id="storyDisplay" class="glass p-8 min-h-96">
+                        <div id="welcomeMessage" class="text-center py-20">
+                            <div class="text-6xl mb-4">🌌</div>
+                            <h3 class="text-2xl font-bold mb-4">Ready to Create Your Story?</h3>
+                            <p class="text-gray-300 mb-6">
+                                Configure your story settings and click "Generate Story" to begin your sci-fi adventure!
+                            </p>
+                            <div class="text-left max-w-md mx-auto space-y-2 text-sm text-gray-400">
+                                <p>✨ AI-generated unique stories</p>
+                                <p>🎨 Optional AI illustrations</p>
+                                <p>🔊 Text-to-speech narration</p>
+                                <p>📥 Save as PDF or text</p>
+                            </div>
+                        </div>
+
+                        <div id="loadingMessage" class="hidden text-center py-20">
+                            <div class="loader mb-4"></div>
+                            <p class="text-xl" id="loadingText">Generating your story...</p>
+                        </div>
+
+                        <div id="storyContent" class="hidden">
+                            <h2 id="storyTitle" class="story-title"></h2>
+
+                            <div id="storyImageContainer" class="hidden text-center">
+                                <img id="storyImage" class="story-image" alt="Story illustration">
+                            </div>
+
+                            <div id="storyBody" class="story-text"></div>
+
+                            <div id="audioControlsContainer" class="hidden audio-controls">
+                                <button id="playBtn" class="audio-btn" title="Play">▶️</button>
+                                <button id="pauseBtn" class="audio-btn hidden" title="Pause">⏸️</button>
+                                <button id="stopBtn" class="audio-btn" title="Stop">⏹️</button>
+                                <div class="flex-1">
+                                    <input type="range" id="audioProgress" min="0" max="100" value="0" style="width: 100%;">
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-3 justify-center mt-8">
+                                <button id="saveTextBtn" class="btn btn-secondary">
+                                    📄 Save as Text
+                                </button>
+                                <button id="savePdfBtn" class="btn btn-secondary">
+                                    📑 Save as PDF
+                                </button>
+                                <button id="regenerateBtn" class="btn btn-secondary">
+                                    🔄 Generate New Story
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- API Key Modal -->
+    <div id="apiKeyModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-4">Configure OpenAI API Key</h2>
+            <p class="text-gray-300 mb-4">
+                To use the AI story generator, you need an OpenAI API key. Your key is stored locally and never sent to any server except OpenAI.
+            </p>
+
+            <div class="form-group">
+                <label for="apiKeyInput">OpenAI API Key</label>
+                <input type="password" id="apiKeyInput" placeholder="sk-...">
+                <p class="text-sm text-gray-400 mt-2">
+                    Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" class="text-accent-lavender hover:underline">OpenAI Dashboard</a>
+                </p>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="saveApiKeyBtn" class="btn btn-primary flex-1">Save</button>
+                <button id="cancelApiKeyBtn" class="btn btn-secondary flex-1">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let currentStory = null;
+        let currentImage = null;
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        let isPaused = false;
+
+        // API Key Management
+        function getApiKey() {
+            return localStorage.getItem('openai_api_key');
+        }
+
+        function setApiKey(key) {
+            localStorage.setItem('openai_api_key', key);
+        }
+
+        // Modal handling
+        document.getElementById('apiKeyBtn').addEventListener('click', () => {
+            document.getElementById('apiKeyModal').classList.remove('hidden');
+            document.getElementById('apiKeyInput').value = getApiKey() || '';
+        });
+
+        document.getElementById('cancelApiKeyBtn').addEventListener('click', () => {
+            document.getElementById('apiKeyModal').classList.add('hidden');
+        });
+
+        document.getElementById('saveApiKeyBtn').addEventListener('click', () => {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                setApiKey(key);
+                showToast('API key saved successfully!', 'success');
+                document.getElementById('apiKeyModal').classList.add('hidden');
+            } else {
+                showToast('Please enter a valid API key', 'error');
+            }
+        });
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Story generation
+        document.getElementById('storyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                showToast('Please configure your OpenAI API key first', 'error');
+                document.getElementById('apiKeyModal').classList.remove('hidden');
+                return;
+            }
+
+            const ageGroup = document.getElementById('ageGroup').value;
+            const theme = document.getElementById('theme').value;
+            const storyLength = document.getElementById('storyLength').value;
+            const protagonist = document.getElementById('protagonist').value;
+            const customPrompt = document.getElementById('customPrompt').value;
+            const generateImage = document.getElementById('generateImage').checked;
+            const enableAudio = document.getElementById('enableAudio').checked;
+
+            // Show loading
+            document.getElementById('welcomeMessage').classList.add('hidden');
+            document.getElementById('storyContent').classList.add('hidden');
+            document.getElementById('loadingMessage').classList.remove('hidden');
+            document.getElementById('loadingText').textContent = 'Generating your story...';
+
+            try {
+                // Generate story
+                const story = await generateStory(apiKey, ageGroup, theme, storyLength, protagonist, customPrompt);
+                currentStory = story;
+
+                // Display story
+                document.getElementById('storyTitle').textContent = story.title;
+                document.getElementById('storyBody').innerHTML = story.content.split('\n\n').map(p => `<p class="mb-4">${p}</p>`).join('');
+
+                // Generate image if requested
+                if (generateImage) {
+                    document.getElementById('loadingText').textContent = 'Generating illustration...';
+                    try {
+                        const imageUrl = await generateImageFromPrompt(apiKey, story.imagePrompt);
+                        currentImage = imageUrl;
+                        document.getElementById('storyImage').src = imageUrl;
+                        document.getElementById('storyImageContainer').classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Image generation failed:', error);
+                        showToast('Story generated, but image generation failed', 'error');
+                        document.getElementById('storyImageContainer').classList.add('hidden');
+                    }
+                } else {
+                    document.getElementById('storyImageContainer').classList.add('hidden');
+                }
+
+                // Setup audio if enabled
+                if (enableAudio) {
+                    document.getElementById('audioControlsContainer').classList.remove('hidden');
+                    setupAudioNarration(story.content);
+                } else {
+                    document.getElementById('audioControlsContainer').classList.add('hidden');
+                }
+
+                // Show story
+                document.getElementById('loadingMessage').classList.add('hidden');
+                document.getElementById('storyContent').classList.remove('hidden');
+
+                showToast('Story generated successfully!', 'success');
+
+            } catch (error) {
+                console.error('Generation error:', error);
+                showToast(`Error: ${error.message}`, 'error');
+                document.getElementById('loadingMessage').classList.add('hidden');
+                document.getElementById('welcomeMessage').classList.remove('hidden');
+            }
+        });
+
+        // Generate story using OpenAI
+        async function generateStory(apiKey, ageGroup, theme, length, protagonist, customPrompt) {
+            const wordCount = length === 'short' ? 500 : length === 'medium' ? 1000 : 1500;
+            const ageDescriptions = {
+                'children': 'children aged 6-10 with simple vocabulary and positive themes',
+                'teens': 'teenagers aged 11-15 with engaging action and relatable characters',
+                'young-adult': 'young adults aged 16+ with complex themes and character development',
+                'adult': 'adult readers with sophisticated storytelling and mature themes'
+            };
+
+            const themeDescriptions = {
+                'space-exploration': 'space exploration and discovery',
+                'time-travel': 'time travel and its consequences',
+                'alien-contact': 'first contact with alien civilizations',
+                'dystopian': 'a dystopian future society',
+                'cyberpunk': 'a cyberpunk world with advanced technology',
+                'robot-ai': 'robots, artificial intelligence, and what it means to be human',
+                'parallel-universe': 'parallel universes and alternate realities',
+                'post-apocalyptic': 'survival in a post-apocalyptic world'
+            };
+
+            const protagonistText = protagonist ? `The main character should be named ${protagonist}.` : '';
+            const customText = customPrompt ? `Additional requirements: ${customPrompt}` : '';
+
+            const prompt = `Write a captivating science fiction story about ${themeDescriptions[theme]} for ${ageDescriptions[ageGroup]}.
+
+The story should be approximately ${wordCount} words long. ${protagonistText} ${customText}
+
+The story should have:
+- An engaging title
+- A clear beginning, middle, and end
+- Vivid descriptions and imagery
+- Compelling characters
+- An interesting plot twist or revelation
+
+Format your response as JSON with this structure:
+{
+    "title": "The story title",
+    "content": "The full story text with paragraphs separated by \\n\\n",
+    "imagePrompt": "A detailed prompt for generating an illustration (one sentence, vivid and specific)"
+}`;
+
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-4o-mini',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are a creative science fiction author who writes engaging stories for various age groups.'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.9,
+                    response_format: { type: "json_object" }
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'Failed to generate story');
+            }
+
+            const data = await response.json();
+            const story = JSON.parse(data.choices[0].message.content);
+            return story;
+        }
+
+        // Generate image using DALL-E
+        async function generateImageFromPrompt(apiKey, prompt) {
+            const response = await fetch('https://api.openai.com/v1/images/generations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'dall-e-3',
+                    prompt: `Science fiction illustration: ${prompt}. Digital art style, vibrant colors, highly detailed.`,
+                    n: 1,
+                    size: '1024x1024',
+                    quality: 'standard'
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'Failed to generate image');
+            }
+
+            const data = await response.json();
+            return data.data[0].url;
+        }
+
+        // Audio narration using Web Speech API
+        function setupAudioNarration(text) {
+            // Stop any existing narration
+            if (currentUtterance) {
+                speechSynthesis.cancel();
+            }
+
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.rate = 0.9;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+
+            // Get a good voice if available
+            const voices = speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => voice.lang.startsWith('en')) || voices[0];
+            if (preferredVoice) {
+                currentUtterance.voice = preferredVoice;
+            }
+
+            currentUtterance.onend = () => {
+                document.getElementById('playBtn').classList.remove('hidden');
+                document.getElementById('pauseBtn').classList.add('hidden');
+                isPaused = false;
+            };
+        }
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (currentUtterance) {
+                if (isPaused) {
+                    speechSynthesis.resume();
+                } else {
+                    speechSynthesis.speak(currentUtterance);
+                }
+                document.getElementById('playBtn').classList.add('hidden');
+                document.getElementById('pauseBtn').classList.remove('hidden');
+                isPaused = false;
+            }
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (currentUtterance && speechSynthesis.speaking) {
+                speechSynthesis.pause();
+                document.getElementById('playBtn').classList.remove('hidden');
+                document.getElementById('pauseBtn').classList.add('hidden');
+                isPaused = true;
+            }
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            if (currentUtterance) {
+                speechSynthesis.cancel();
+                document.getElementById('playBtn').classList.remove('hidden');
+                document.getElementById('pauseBtn').classList.add('hidden');
+                isPaused = false;
+            }
+        });
+
+        // Save as text
+        document.getElementById('saveTextBtn').addEventListener('click', () => {
+            if (!currentStory) return;
+
+            const content = `${currentStory.title}\n\n${'='.repeat(currentStory.title.length)}\n\n${currentStory.content}`;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentStory.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Story saved as text file!', 'success');
+        });
+
+        // Save as PDF
+        document.getElementById('savePdfBtn').addEventListener('click', async () => {
+            if (!currentStory) return;
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Title
+                doc.setFontSize(20);
+                doc.setFont(undefined, 'bold');
+                const titleLines = doc.splitTextToSize(currentStory.title, 170);
+                doc.text(titleLines, 20, 20);
+
+                // Add image if available
+                let yPos = 20 + (titleLines.length * 10) + 10;
+
+                if (currentImage) {
+                    try {
+                        // Convert image to base64
+                        const img = document.getElementById('storyImage');
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                        ctx.drawImage(img, 0, 0);
+                        const imgData = canvas.toDataURL('image/jpeg');
+
+                        doc.addImage(imgData, 'JPEG', 20, yPos, 170, 100);
+                        yPos += 110;
+                    } catch (e) {
+                        console.error('Failed to add image to PDF:', e);
+                    }
+                }
+
+                // Content
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                const lines = doc.splitTextToSize(currentStory.content, 170);
+
+                lines.forEach(line => {
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    doc.text(line, 20, yPos);
+                    yPos += 7;
+                });
+
+                doc.save(`${currentStory.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.pdf`);
+                showToast('Story saved as PDF!', 'success');
+            } catch (error) {
+                console.error('PDF generation failed:', error);
+                showToast('Failed to generate PDF', 'error');
+            }
+        });
+
+        // Regenerate story
+        document.getElementById('regenerateBtn').addEventListener('click', () => {
+            document.getElementById('storyContent').classList.add('hidden');
+            document.getElementById('welcomeMessage').classList.remove('hidden');
+            currentStory = null;
+            currentImage = null;
+            if (currentUtterance) {
+                speechSynthesis.cancel();
+            }
+        });
+
+        // Load voices for speech synthesis
+        speechSynthesis.getVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+        }
+
+        // Animate elements on load
+        anime({
+            targets: '.glass',
+            opacity: [0, 1],
+            translateY: [20, 0],
+            delay: anime.stagger(100),
+            easing: 'easeOutQuad',
+            duration: 800
+        });
+    </script>
+</body>
+</html>
