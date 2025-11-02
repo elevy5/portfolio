@@ -1,8 +1,8 @@
 // Main JavaScript file for Elie Levy Portfolio
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Load header first, then initialize other functionality
-    loadHeader().then(() => {
+    // Load header and footer, then initialize other functionality
+    Promise.all([loadHeader(), loadFooter()]).then(() => {
         initTypewriter();
         initScrollReveal();
         initMobileMenu();
@@ -23,6 +23,20 @@ async function loadHeader() {
             headerPlaceholder.innerHTML = headerHTML;
         } catch (error) {
             console.error('Error loading header:', error);
+        }
+    }
+}
+
+// Load footer from external file
+async function loadFooter() {
+    const footerPlaceholder = document.getElementById('footer-placeholder');
+    if (footerPlaceholder) {
+        try {
+            const response = await fetch('footer.html');
+            const footerHTML = await response.text();
+            footerPlaceholder.innerHTML = footerHTML;
+        } catch (error) {
+            console.error('Error loading footer:', error);
         }
     }
 }
