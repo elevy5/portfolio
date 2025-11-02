@@ -1,15 +1,31 @@
 // Main JavaScript file for Elie Levy Portfolio
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all functionality
-    initTypewriter();
-    initScrollReveal();
-    initMobileMenu();
-    initSmoothScrolling();
-    initFormValidation();
-    initProjectFiltering();
-    initAnimations();
+    // Load header first, then initialize other functionality
+    loadHeader().then(() => {
+        initTypewriter();
+        initScrollReveal();
+        initMobileMenu();
+        initSmoothScrolling();
+        initFormValidation();
+        initProjectFiltering();
+        initAnimations();
+    });
 });
+
+// Load header from external file
+async function loadHeader() {
+    const headerPlaceholder = document.getElementById('header-placeholder');
+    if (headerPlaceholder) {
+        try {
+            const response = await fetch('header.html');
+            const headerHTML = await response.text();
+            headerPlaceholder.innerHTML = headerHTML;
+        } catch (error) {
+            console.error('Error loading header:', error);
+        }
+    }
+}
 
 // Typewriter effect for hero section
 function initTypewriter() {
